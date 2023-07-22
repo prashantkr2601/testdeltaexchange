@@ -4,33 +4,29 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   deleteNote,
   getAllNotes,
+  handleChangeCheckboxList,
+  handleCompanySelect,
   selectAllNotes,
+  selectFilteredNotes,
+  selectUniqueCompany,
+  sortNotes,
+  uniqueCompanies,
 } from "../../features/notesSlice";
 
 export const NoteLists = () => {
   const dispatch = useDispatch();
+  const uniqueCompany = useSelector(selectUniqueCompany);
   const notes = useSelector(selectAllNotes);
-
+  const filteredNotes = useSelector(selectFilteredNotes);
   const [expanded, setExpanded] = useState(false);
-  const [uniqueCompany, setUniqueCompany] = useState([]);
-  const [selectedFilters, setSelectedFilters] = useState([]);
-  const [filteredItems, setFilteredItems] = useState(notes);
 
   useEffect(() => {
-    const key = "company";
-    const uniqueCompany = [
-      ...new Map(notes.map((item) => [item[key], item])).values(),
-    ];
-    setUniqueCompany(uniqueCompany);
+    dispatch(uniqueCompanies());
   }, [notes]);
 
   useEffect(() => {
     dispatch(getAllNotes());
   }, []);
-
-  useEffect(() => {
-    filterItems();
-  }, [selectedFilters]);
 
   const showCheckboxes = () => {
     var checkboxes = document.getElementById("checkboxes");
@@ -42,67 +38,31 @@ export const NoteLists = () => {
       setExpanded(false);
     }
   };
-
-  const handleChangeCheckboxList = (e) => {
-    const { checked, name } = e.target.checked;
-    if (name === "selectAll") {
-      let tempUser = notes.map((note) => {
-        return { ...note, isSelected: checked };
-      });
-      // setUsers(tempUser);
-    } else {
-      let tempUser = notes.map((note) =>
-        note.name === name ? { ...note, isSelected: checked } : note
-      );
-      // setUsers(tempUser);
-    }
+  const sortByStatus = (e) => {
+    dispatch(sortNotes(e.target.value));
+    console.log(e.target.value);
   };
 
-  const handleChange = (e) => {
-    const checked = e.target.checked;
-    const selectedCategory = e.target.name;
-
-    if (selectedCategory === "selectAll") {
-      let tempUser = uniqueCompany.map((company) => {
-        return { ...company, isCompanySelected: checked };
-      });
-      setUniqueCompany(tempUser);
-
-      if (checked) {
-        setSelectedFilters(uniqueCompany.map((note) => note.company));
-      } else {
-        setSelectedFilters([]);
-      }
-    } else {
-      let tempUser = uniqueCompany.map((company) =>
-        company.company === selectedCategory
-          ? { ...company, isCompanySelected: checked }
-          : company
-      );
-      setUniqueCompany(tempUser);
-
-      if (selectedFilters.includes(selectedCategory)) {
-        let filters = selectedFilters.filter((el) => el !== selectedCategory);
-        setSelectedFilters(filters);
-      } else {
-        setSelectedFilters([...selectedFilters, selectedCategory]);
-      }
-    }
-    console.log(selectedFilters);
-  };
-
-  const filterItems = () => {
-    if (selectedFilters.length > 0) {
-      let tempItems = selectedFilters.map((selectedCategory) => {
-        let temp = notes.filter((note) => note.company === selectedCategory);
-        return temp;
-      });
-      setFilteredItems(tempItems.flat());
-    } else {
-      setFilteredItems([...notes]);
-    }
-    console.log(filteredItems);
-  };
+  // const handleChangeCheckboxList = (e) => {
+  //   const { checked, name } = e.target;
+  //   if (name === "selectAll") {
+  //     let tempNotes = (filteredNotes.length > 0 ? filteredNotes : notes).map(
+  //       (note) => {
+  //         return { ...note, isSelected: checked };
+  //       }
+  //     );
+  //     // filteredNotes.length > 0
+  //     //   ? setFilteredNotes(tempNotes)
+  //     //   : setNotes(tempNotes);
+  //   } else {
+  //     let tempNotes = (filteredNotes.length > 0 ? filteredNotes : notes).map(
+  //       (note) => (note.name === name ? { ...note, isSelected: checked } : note)
+  //     );
+  //     // filteredNotes.length > 0
+  //     //   ? setFilteredNotes(tempNotes)
+  //     //   : setNotes(tempNotes);
+  //   }
+  // };
 
   return (
     <>
@@ -110,7 +70,7 @@ export const NoteLists = () => {
         <div className="multiselect">
           <div className="selectBox" onClick={showCheckboxes}>
             <select>
-              <option>Company({notes.length})</option>
+              <option>Company({uniqueCompany.length})</option>
             </select>
             <div className="overSelect"></div>
           </div>
@@ -120,7 +80,7 @@ export const NoteLists = () => {
                 type="checkbox"
                 id="selectAllCompany"
                 name="selectAll"
-                onChange={handleChange}
+                onChange={(e) => dispatch(handleCompanySelect(e))}
                 checked={
                   !uniqueCompany.some(
                     (note) => note?.isCompanySelected !== true
@@ -135,13 +95,20 @@ export const NoteLists = () => {
                   type="checkbox"
                   id={note.company}
                   name={note.company}
-                  onChange={handleChange}
+                  onChange={(e) => dispatch(handleCompanySelect(e))}
                   checked={note?.isCompanySelected || false}
                 />
                 {note.company}
               </label>
             ))}
           </div>
+        </div>
+        <div>
+          <select onChange={(e) => sortByStatus(e)}>
+            <option>Status</option>
+            <option value="active">Active</option>
+            <option value="closed">closed</option>
+          </select>
         </div>
       </form>
 
@@ -153,8 +120,12 @@ export const NoteLists = () => {
                 <input
                   type="checkbox"
                   name="selectAll"
-                  checked={!notes.some((note) => note?.isSelected !== true)}
-                  onChange={handleChangeCheckboxList}
+                  checked={
+                    !(filteredNotes.length > 0 ? filteredNotes : notes).some(
+                      (note) => note?.isSelected !== true
+                    )
+                  }
+                  onChange={(e) => dispatch(handleChangeCheckboxList(e))}
                 />
               </th>
               <th>Name</th>
@@ -165,32 +136,39 @@ export const NoteLists = () => {
             </tr>
           </thead>
           <tbody>
-            {notes.map((note, key) => {
-              // console.log("val:=>", val);
-              return (
-                <tr key={note.id}>
-                  <td>
+            {(filteredNotes.length > 0 ? filteredNotes : notes).map(
+              (note, key) => {
+                // console.log("val:=>", val);
+                return (
+                  <tr key={note.id}>
+                    <td>
+                      <input
+                        type="checkbox"
+                        name={note.id}
+                        id={note.id}
+                        checked={note.isSelected || false}
+                        onChange={(e) => dispatch(handleChangeCheckboxList(e))}
+                      />
+                    </td>
+                    <td>{note.username}</td>
+                    <td>{note.company}</td>
+                    <td>{note.status}</td>
+
+                    <td>
+                      {new Date(
+                        note?.lastUpdated?.nanoseconds
+                      ).toLocaleDateString()}
+                    </td>
+                    <td>{note.notes}</td>
                     <input
-                      type="checkbox"
-                      name={note.company}
-                      id={note.id}
-                      checked={note.isSelected || false}
-                      onChange={handleChangeCheckboxList}
+                      type="button"
+                      value="Delete"
+                      onClick={(e) => dispatch(deleteNote(note.id))}
                     />
-                  </td>
-                  <td>{note.username}</td>
-                  <td>{note.company}</td>
-                  <td>{note.status}</td>
-                  <td>{note.lastUpdated}</td>
-                  <td>{note.notes}</td>
-                  <input
-                    type="button"
-                    value="Delete"
-                    onClick={(e) => dispatch(deleteNote(note.id))}
-                  />
-                </tr>
-              );
-            })}
+                  </tr>
+                );
+              }
+            )}
           </tbody>
         </table>
       </div>

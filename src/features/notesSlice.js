@@ -1,5 +1,15 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import notesServices from "../services/notes.services";
+import { useDispatch } from "react-redux";
+
+const initialState = {
+  note: [],
+  uniqueCompany: [],
+  selectedCompanyFilters: [],
+  filteredNotes: [],
+  loading: false,
+  error: null,
+};
 
 export const createNote = createAsyncThunk(
   "createNote",
@@ -43,7 +53,108 @@ export const deleteNote = createAsyncThunk(
 
 export const notes = createSlice({
   name: "notes",
-  initialState: { note: [], loading: false, error: null },
+  initialState,
+  reducers: {
+    uniqueCompanies: (state) => {
+      const key = "company";
+      state.uniqueCompany = [
+        ...new Map(state.note.map((item) => [item[key], item])).values(),
+      ];
+    },
+
+    sortNotes: (state, action) => {
+      const sortBy = action.payload;
+      const tempArr =
+        state.filteredNotes.length > 0 ? state.filteredNotes : state.note;
+
+      if (sortBy === "active") {
+        tempArr.sort((a, b) => a.status.localeCompare(b.status));
+      } else if (sortBy === "closed") {
+        tempArr.sort((a, b) => b.status.localeCompare(a.status));
+      }
+      state.filteredNotes.length > 0
+        ? (state.filteredNotes = tempArr)
+        : (state.note = tempArr);
+    },
+
+    handleChangeCheckboxList: (state, action) => {
+      const name = action.payload.target.name;
+      const checked = action.payload.target.checked;
+
+      if (name === "selectAll") {
+        let tempNotes = (
+          state.filteredNotes.length > 0 ? state.filteredNotes : state.note
+        ).map((note) => {
+          return { ...note, isSelected: checked };
+        });
+        state.filteredNotes.length > 0
+          ? (state.filteredNotes = tempNotes)
+          : (state.note = tempNotes);
+      } else {
+        let tempNotes = (
+          state.filteredNotes.length > 0 ? state.filteredNotes : state.note
+        ).map((note) =>
+          note.id === name ? { ...note, isSelected: checked } : note
+        );
+        state.filteredNotes.length > 0
+          ? (state.filteredNotes = tempNotes)
+          : (state.note = tempNotes);
+      }
+    },
+
+    handleCompanySelect: (state, action) => {
+      const SelectedCompany = action.payload.target.name;
+      const checked = action.payload.target.checked;
+
+      if (SelectedCompany === "selectAll") {
+        let tempUniqueCompany = state.uniqueCompany.map((company) => {
+          return { ...company, isCompanySelected: checked };
+        });
+
+        state.uniqueCompany = tempUniqueCompany;
+
+        if (checked) {
+          state.selectedCompanyFilters = state.uniqueCompany.map(
+            (note) => note.company
+          );
+        } else {
+          state.selectedCompanyFilters = [];
+        }
+      } else {
+        let tempUniqueCompany = state.uniqueCompany.map((company) =>
+          company.company === SelectedCompany
+            ? { ...company, isCompanySelected: checked }
+            : company
+        );
+        state.uniqueCompany = tempUniqueCompany;
+
+        if (state.selectedCompanyFilters.includes(SelectedCompany)) {
+          let filters = state.selectedCompanyFilters.filter(
+            (el) => el !== SelectedCompany
+          );
+          state.selectedCompanyFilters = filters;
+        } else {
+          state.selectedCompanyFilters = [
+            ...state.selectedCompanyFilters,
+            SelectedCompany,
+          ];
+        }
+        console.log("state=>", state);
+      }
+
+      console.log("uniqueCompanies:=>", state.uniqueCompany);
+      console.log("selectedCompanyFilters:=>", state.selectedCompanyFilters);
+
+      if (state.selectedCompanyFilters.length > 0) {
+        let tempNotes = state.selectedCompanyFilters.map((SelectedCompany) => {
+          return state.note.filter((note) => note.company === SelectedCompany);
+        });
+        state.filteredNotes = [...tempNotes.flat()];
+      } else {
+        state.filteredNotes = [...state.note];
+      }
+    },
+  },
 
   extraReducers: (builder) => {
     builder
@@ -53,6 +164,11 @@ export const notes = createSlice({
       .addCase(createNote.fulfilled, (state, action) => {
         state.loading = false;
         state.note.push(action.meta.arg);
+        // state.uniqueCompany = [
+        //   ...new Map(
+        //     state.note.map((item) => [item["company"], item])
+        //   ).values(),
+        // ];
         state.error = null;
       })
       .addCase(createNote.rejected, (state, action) => {
@@ -66,6 +182,13 @@ export const notes = createSlice({
       .addCase(getAllNotes.fulfilled, (state, action) => {
         state.loading = false;
         state.note = state.note.concat(action.payload);
+        console.log(state.note);
+        // state.uniqueCompany = [
+        //   ...new Map(
+        //     state.note.map((item) => [item["company"], item])
+        //   ).values(),
+        // ];
+
         state.error = null;
       })
       .addCase(getAllNotes.rejected, (state, action) => {
@@ -81,6 +204,11 @@ export const notes = createSlice({
         const id = action.meta.arg;
         if (id) {
           state.note = state.note.filter((data) => data.id !== id);
+          // state.uniqueCompany = [
+          //   ...new Map(
+          //     state.note.map((item) => [item["company"], item])
+          //   ).values(),
+          // ];
         }
         state.error = null;
       })
@@ -91,4 +219,13 @@ export const notes = createSlice({
   },
 });
 
+export const {
+  uniqueCompanies,
+  handleCompanySelect,
+  handleChangeCheckboxList,
+  sortNotes,
+} = notes.actions;
 export const selectAllNotes = (state) => state.notes.note;
+export const selectUniqueCompany = (state) => state.notes.uniqueCompany;
+export const selectFilteredNotes = (state) => state.notes.filteredNotes;
+export const notesReducer = notes.reducer;
