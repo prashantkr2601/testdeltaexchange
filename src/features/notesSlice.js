@@ -1,12 +1,12 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import notesServices from "../services/notes.services";
-import { useDispatch } from "react-redux";
 
 const initialState = {
   note: [],
   uniqueCompany: [],
   selectedCompanyFilters: [],
   filteredNotes: [],
+  selectedCompanyCount: 0,
   loading: false,
   error: null,
 };
@@ -139,11 +139,7 @@ export const notes = createSlice({
             SelectedCompany,
           ];
         }
-        console.log("state=>", state);
       }
-
-      console.log("uniqueCompanies:=>", state.uniqueCompany);
-      console.log("selectedCompanyFilters:=>", state.selectedCompanyFilters);
 
       if (state.selectedCompanyFilters.length > 0) {
         let tempNotes = state.selectedCompanyFilters.map((SelectedCompany) => {
@@ -164,11 +160,6 @@ export const notes = createSlice({
       .addCase(createNote.fulfilled, (state, action) => {
         state.loading = false;
         state.note.push(action.meta.arg);
-        // state.uniqueCompany = [
-        //   ...new Map(
-        //     state.note.map((item) => [item["company"], item])
-        //   ).values(),
-        // ];
         state.error = null;
       })
       .addCase(createNote.rejected, (state, action) => {
@@ -181,14 +172,7 @@ export const notes = createSlice({
       })
       .addCase(getAllNotes.fulfilled, (state, action) => {
         state.loading = false;
-        state.note = state.note.concat(action.payload);
-        console.log(state.note);
-        // state.uniqueCompany = [
-        //   ...new Map(
-        //     state.note.map((item) => [item["company"], item])
-        //   ).values(),
-        // ];
-
+        state.note = action.payload;
         state.error = null;
       })
       .addCase(getAllNotes.rejected, (state, action) => {
@@ -204,11 +188,6 @@ export const notes = createSlice({
         const id = action.meta.arg;
         if (id) {
           state.note = state.note.filter((data) => data.id !== id);
-          // state.uniqueCompany = [
-          //   ...new Map(
-          //     state.note.map((item) => [item["company"], item])
-          //   ).values(),
-          // ];
         }
         state.error = null;
       })
@@ -228,4 +207,6 @@ export const {
 export const selectAllNotes = (state) => state.notes.note;
 export const selectUniqueCompany = (state) => state.notes.uniqueCompany;
 export const selectFilteredNotes = (state) => state.notes.filteredNotes;
+export const selectedCompanyCount = (state) =>
+  state.notes.selectedCompanyFilters.length;
 export const notesReducer = notes.reducer;

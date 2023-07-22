@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import notesServices from "../../services/notes.services";
 import { useDispatch } from "react-redux";
 import { createNote } from "../../features/notesSlice";
 
@@ -13,25 +12,13 @@ export const NoteForms = () => {
     setInputs((values) => ({ ...values, [name]: value }));
   };
 
-  // const sendNotes = async (inputs) => {
-  //   try {
-  //     const data = await notesServices.addNote(inputs);
-  //     console.log(data);
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
   const handleSubmit = (event) => {
     event.preventDefault();
-    dispatch(createNote(inputs));
-    // sendNotes(inputs);
-    console.log(inputs);
+    dispatch(createNote({ ...inputs, lastUpdated: new Date() }));
   };
 
   return (
     <>
-      {/* <pre>{inputs}</pre> */}
-
       <form onSubmit={handleSubmit}>
         <label>
           Name:

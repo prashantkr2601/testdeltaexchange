@@ -6,16 +6,12 @@ import {
   addDoc,
   doc,
   deleteDoc,
-  serverTimestamp,
 } from "firebase/firestore";
 
 const notesCollection = collection(db, "notes");
 class NotesService {
   addNote = async (newNote) => {
-    return await addDoc(notesCollection, {
-      ...newNote,
-      lastUpdated: new Date(),
-    });
+    return await addDoc(notesCollection, newNote);
   };
 
   getNote = async (id) => {
@@ -30,4 +26,4 @@ class NotesService {
     return await deleteDoc(doc(db, "notes", id));
   };
 }
-export default new NotesService();
+export default NotesService = new NotesService();

@@ -9,6 +9,7 @@ import {
   selectAllNotes,
   selectFilteredNotes,
   selectUniqueCompany,
+  selectedCompanyCount,
   sortNotes,
   uniqueCompanies,
 } from "../../features/notesSlice";
@@ -16,17 +17,18 @@ import {
 export const NoteLists = () => {
   const dispatch = useDispatch();
   const uniqueCompany = useSelector(selectUniqueCompany);
+  const selectedCompany = useSelector(selectedCompanyCount);
   const notes = useSelector(selectAllNotes);
   const filteredNotes = useSelector(selectFilteredNotes);
   const [expanded, setExpanded] = useState(false);
 
   useEffect(() => {
     dispatch(uniqueCompanies());
-  }, [notes]);
+  }, [dispatch, notes]);
 
   useEffect(() => {
     dispatch(getAllNotes());
-  }, []);
+  }, [dispatch]);
 
   const showCheckboxes = () => {
     var checkboxes = document.getElementById("checkboxes");
@@ -40,29 +42,7 @@ export const NoteLists = () => {
   };
   const sortByStatus = (e) => {
     dispatch(sortNotes(e.target.value));
-    console.log(e.target.value);
   };
-
-  // const handleChangeCheckboxList = (e) => {
-  //   const { checked, name } = e.target;
-  //   if (name === "selectAll") {
-  //     let tempNotes = (filteredNotes.length > 0 ? filteredNotes : notes).map(
-  //       (note) => {
-  //         return { ...note, isSelected: checked };
-  //       }
-  //     );
-  //     // filteredNotes.length > 0
-  //     //   ? setFilteredNotes(tempNotes)
-  //     //   : setNotes(tempNotes);
-  //   } else {
-  //     let tempNotes = (filteredNotes.length > 0 ? filteredNotes : notes).map(
-  //       (note) => (note.name === name ? { ...note, isSelected: checked } : note)
-  //     );
-  //     // filteredNotes.length > 0
-  //     //   ? setFilteredNotes(tempNotes)
-  //     //   : setNotes(tempNotes);
-  //   }
-  // };
 
   return (
     <>
@@ -70,7 +50,10 @@ export const NoteLists = () => {
         <div className="multiselect">
           <div className="selectBox" onClick={showCheckboxes}>
             <select>
-              <option>Company({uniqueCompany.length})</option>
+              <option>
+                Company(
+                {selectedCompany})
+              </option>
             </select>
             <div className="overSelect"></div>
           </div>
@@ -138,7 +121,6 @@ export const NoteLists = () => {
           <tbody>
             {(filteredNotes.length > 0 ? filteredNotes : notes).map(
               (note, key) => {
-                // console.log("val:=>", val);
                 return (
                   <tr key={note.id}>
                     <td>
@@ -156,7 +138,7 @@ export const NoteLists = () => {
 
                     <td>
                       {new Date(
-                        note?.lastUpdated?.nanoseconds
+                        note.lastUpdated.nanoseconds
                       ).toLocaleDateString()}
                     </td>
                     <td>{note.notes}</td>
