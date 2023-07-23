@@ -36,7 +36,7 @@ export const NoteForms = () => {
 
   return (
     <>
-      {errors && <div className="error">Please fill atleast one field</div>}
+      {errors && <div className="error">Kindly fill the details.</div>}
 
       <form onSubmit={handleSubmit}>
         <div className="form-container">
