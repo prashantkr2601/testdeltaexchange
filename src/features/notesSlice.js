@@ -7,6 +7,7 @@ const initialState = {
   selectedCompanyFilters: [],
   filteredNotes: [],
   selectedCompanyCount: 0,
+  isModalOpen: false,
   loading: false,
   error: null,
 };
@@ -55,6 +56,9 @@ export const notes = createSlice({
   name: "notes",
   initialState,
   reducers: {
+    handleModal: (state) => {
+      state.isModalOpen = !state.isModalOpen;
+    },
     uniqueCompanies: (state) => {
       const key = "company";
       state.uniqueCompany = [
@@ -159,7 +163,6 @@ export const notes = createSlice({
       })
       .addCase(createNote.fulfilled, (state, action) => {
         state.loading = false;
-        state.note.push(action.meta.arg);
         state.error = null;
       })
       .addCase(createNote.rejected, (state, action) => {
@@ -203,11 +206,13 @@ export const {
   handleCompanySelect,
   handleChangeCheckboxList,
   sortNotes,
+  handleModal,
 } = notes.actions;
 export const selectAllNotes = (state) => state.notes.note;
 export const selectUniqueCompany = (state) => state.notes.uniqueCompany;
 export const selectFilteredNotes = (state) => state.notes.filteredNotes;
 export const selectLoading = (state) => state.notes.loading;
+export const isModalOpen = (state) => state.notes.isModalOpen;
 export const selectedCompanyCount = (state) =>
   state.notes.selectedCompanyFilters.length;
 export const notesReducer = notes.reducer;

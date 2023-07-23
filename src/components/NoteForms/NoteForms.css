@@ -13,7 +13,7 @@ input {
 
 .btn-group {
   display: flex;
-  justify-content: end;
+  justify-content: flex-end;
   gap: 1rem;
   padding: 0 15px;
 }
@@ -35,4 +35,11 @@ input {
   color: #1e90ff;
   border: 1px solid #1e90ff;
   background-color: white;
+}
+.error {
+  color: red;
+  font-weight: bolder;
+  font-size: 0.8rem;
+  margin: 0;
+  padding: 0;
 }

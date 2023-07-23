@@ -1,7 +1,7 @@
 .header {
   display: flex;
   align-items: center;
-  justify-content: start;
+  justify-content: flex-start;
   gap: 1rem;
   margin: 35px 0 16px 0;
 }
@@ -9,7 +9,7 @@
   margin: 0;
 }
 .modal {
-  display: none; /* Hidden by default */
+  display: block; /* Hidden by default */
   position: fixed; /* Stay in place */
   z-index: 1; /* Sit on top */
   padding-top: 100px; /* Location of the box */

@@ -1,10 +1,15 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
-import { createNote } from "../../features/notesSlice";
+import {
+  createNote,
+  getAllNotes,
+  handleModal,
+} from "../../features/notesSlice";
 import "./NoteForms.css";
 
 export const NoteForms = () => {
   const [inputs, setInputs] = useState({});
+  const [errors, setErrors] = useState(false);
   const dispatch = useDispatch();
 
   const handleChange = (event) => {
@@ -15,11 +20,24 @@ export const NoteForms = () => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    dispatch(createNote({ ...inputs, lastUpdated: new Date() }));
+    if (
+      inputs?.username?.length > 0 ||
+      inputs?.company?.length > 0 ||
+      inputs?.status?.length > 0 ||
+      inputs?.notes?.length > 0
+    ) {
+      dispatch(createNote({ ...inputs, lastUpdated: new Date() }));
+      dispatch(getAllNotes());
+      dispatch(handleModal());
+    } else {
+      setErrors(true);
+    }
   };
 
   return (
     <>
+      {errors && <div className="error">Please fill atleast one field</div>}
+
       <form onSubmit={handleSubmit}>
         <div className="form-container">
           <h4>Add Member</h4>
@@ -57,7 +75,12 @@ export const NoteForms = () => {
           />
         </div>
         <div className="btn-group">
-          <input className="cancel-btn" type="button" value="Cancel" />
+          <input
+            className="cancel-btn"
+            type="button"
+            value="Cancel"
+            onClick={() => dispatch(handleModal())}
+          />
           <input className="save-btn" type="submit" value="Save" />
         </div>
       </form>
