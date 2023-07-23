@@ -57,52 +57,50 @@ export const NoteLists = () => {
             </select>
             <div className="overSelect" key="overSelect"></div>
           </div>
-          <div id="checkboxes">
-            <label>
-              <input
-                type="checkbox"
-                key="selectAllCompany"
-                name="selectAll"
-                onChange={(e) => dispatch(handleCompanySelect(e))}
-                checked={
-                  !uniqueCompany.some(
-                    (note) => note?.isCompanySelected !== true
-                  )
-                }
-              />
-              Select All
-            </label>
-            {uniqueCompany.map((note) => (
-              <label key={note.company + note.id}>
-                <input
-                  type="checkbox"
-                  id={note.company}
-                  name={note.company}
-                  onChange={(e) => dispatch(handleCompanySelect(e))}
-                  checked={note?.isCompanySelected || false}
-                />
-                {note.company}
-              </label>
-            ))}
+          <div className="status-list">
+            <select onChange={(e) => sortByStatus(e)}>
+              <option value="Status" key="Status">
+                Status
+              </option>
+              <option value="active" key="active">
+                Active
+              </option>
+              <option value="closed" key="closed">
+                closed
+              </option>
+            </select>
           </div>
         </div>
-        <div>
-          <select onChange={(e) => sortByStatus(e)}>
-            <option value="Status" key="Status">
-              Status
-            </option>
-            <option value="active" key="active">
-              Active
-            </option>
-            <option value="closed" key="closed">
-              closed
-            </option>
-          </select>
+        <div id="checkboxes">
+          <label>
+            <input
+              type="checkbox"
+              key="selectAllCompany"
+              name="selectAll"
+              onChange={(e) => dispatch(handleCompanySelect(e))}
+              checked={
+                !uniqueCompany.some((note) => note?.isCompanySelected !== true)
+              }
+            />
+            Select All
+          </label>
+          {uniqueCompany.map((note) => (
+            <label key={note.company + note.id}>
+              <input
+                type="checkbox"
+                id={note.company}
+                name={note.company}
+                onChange={(e) => dispatch(handleCompanySelect(e))}
+                checked={note?.isCompanySelected || false}
+              />
+              {note.company}
+            </label>
+          ))}
         </div>
       </form>
 
       <div>
-        <table key="table">
+        <table key="table" id="notes-table" cellPadding="0" cellSpacing="0">
           <thead key="theader">
             <tr key="header">
               <th key="selectAllth">
@@ -123,6 +121,7 @@ export const NoteLists = () => {
               <th key="Status">Status</th>
               <th key="LastUpdated">Last Updated</th>
               <th key="Notes">Notes</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
@@ -150,9 +149,11 @@ export const NoteLists = () => {
                     </td>
                     <td>{note.notes}</td>
                     <td>
-                      <input
-                        type="button"
-                        value="Delete"
+                      <img
+                        src="./assets/images/bin-logo.png"
+                        width="15"
+                        height="20"
+                        alt="delete"
                         key={note.id}
                         onClick={(e) => dispatch(deleteNote(note.id))}
                       />

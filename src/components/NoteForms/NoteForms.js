@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { createNote } from "../../features/notesSlice";
+import "./NoteForms.css";
 
 export const NoteForms = () => {
   const [inputs, setInputs] = useState({});
@@ -20,44 +21,45 @@ export const NoteForms = () => {
   return (
     <>
       <form onSubmit={handleSubmit}>
-        <label>
-          Name:
+        <div className="form-container">
+          <h4>Add Member</h4>
+          <label>Name</label>
           <input
             type="text"
             name="username"
+            id="username"
             value={inputs.username || ""}
             onChange={handleChange}
           />
-        </label>
-        <label>
-          Company:
+
+          <label>Company</label>
           <input
             type="text"
             name="company"
             value={inputs.company || ""}
             onChange={handleChange}
           />
-        </label>
-        <label>
-          Status:
+
+          <label>Status</label>
           <input
             type="text"
             name="status"
             value={inputs.status || ""}
             onChange={handleChange}
           />
-        </label>
-        <label>
-          Notes:
+
+          <label>Notes</label>
           <input
             type="text"
             name="notes"
             value={inputs.notes || ""}
             onChange={handleChange}
           />
-        </label>
-        <input type="submit" value="Save" />
-        <input type="button" value="Cancel" />
+        </div>
+        <div className="btn-group">
+          <input className="cancel-btn" type="button" value="Cancel" />
+          <input className="save-btn" type="submit" value="Save" />
+        </div>
       </form>
     </>
   );

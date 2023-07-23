@@ -1,0 +1,38 @@
+.form-container {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+input {
+  border: 1px solid #a9a9a9;
+  padding: 8px;
+  border-radius: 2px;
+  margin: 6px 0;
+}
+
+.btn-group {
+  display: flex;
+  justify-content: end;
+  gap: 1rem;
+  padding: 0 15px;
+}
+
+.btn-group input {
+  width: fit-content;
+  padding: 4px 20px;
+  border-radius: 20px;
+  cursor: pointer;
+}
+
+.save-btn {
+  background-color: #1e90ff;
+  color: white;
+  border: none;
+}
+
+.cancel-btn {
+  color: #1e90ff;
+  border: 1px solid #1e90ff;
+  background-color: white;
+}
