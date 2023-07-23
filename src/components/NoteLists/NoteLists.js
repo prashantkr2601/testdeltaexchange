@@ -48,20 +48,20 @@ export const NoteLists = () => {
     <>
       <form>
         <div className="multiselect">
-          <div className="selectBox" onClick={showCheckboxes}>
-            <select>
-              <option>
+          <div className="selectBox" onClick={showCheckboxes} key="multiselect">
+            <select key="selectBox">
+              <option value="company" key="selectedCompanyCount">
                 Company(
                 {selectedCompany})
               </option>
             </select>
-            <div className="overSelect"></div>
+            <div className="overSelect" key="overSelect"></div>
           </div>
           <div id="checkboxes">
             <label>
               <input
                 type="checkbox"
-                id="selectAllCompany"
+                key="selectAllCompany"
                 name="selectAll"
                 onChange={(e) => dispatch(handleCompanySelect(e))}
                 checked={
@@ -73,7 +73,7 @@ export const NoteLists = () => {
               Select All
             </label>
             {uniqueCompany.map((note) => (
-              <label key={note.company}>
+              <label key={note.company + note.id}>
                 <input
                   type="checkbox"
                   id={note.company}
@@ -88,21 +88,28 @@ export const NoteLists = () => {
         </div>
         <div>
           <select onChange={(e) => sortByStatus(e)}>
-            <option>Status</option>
-            <option value="active">Active</option>
-            <option value="closed">closed</option>
+            <option value="Status" key="Status">
+              Status
+            </option>
+            <option value="active" key="active">
+              Active
+            </option>
+            <option value="closed" key="closed">
+              closed
+            </option>
           </select>
         </div>
       </form>
 
       <div>
-        <table>
-          <thead>
-            <tr>
-              <th>
+        <table key="table">
+          <thead key="theader">
+            <tr key="header">
+              <th key="selectAllth">
                 <input
                   type="checkbox"
                   name="selectAll"
+                  key="selectAll"
                   checked={
                     !(filteredNotes.length > 0 ? filteredNotes : notes).some(
                       (note) => note?.isSelected !== true
@@ -111,18 +118,18 @@ export const NoteLists = () => {
                   onChange={(e) => dispatch(handleChangeCheckboxList(e))}
                 />
               </th>
-              <th>Name</th>
-              <th>Company</th>
-              <th>Status</th>
-              <th>Last Updated</th>
-              <th>Notes</th>
+              <th key="Name">Name</th>
+              <th key="Company">Company</th>
+              <th key="Status">Status</th>
+              <th key="LastUpdated">Last Updated</th>
+              <th key="Notes">Notes</th>
             </tr>
           </thead>
           <tbody>
             {(filteredNotes.length > 0 ? filteredNotes : notes).map(
               (note, key) => {
                 return (
-                  <tr key={note.id}>
+                  <tr key={note.id + key}>
                     <td>
                       <input
                         type="checkbox"
@@ -142,11 +149,14 @@ export const NoteLists = () => {
                       ).toLocaleDateString()}
                     </td>
                     <td>{note.notes}</td>
-                    <input
-                      type="button"
-                      value="Delete"
-                      onClick={(e) => dispatch(deleteNote(note.id))}
-                    />
+                    <td>
+                      <input
+                        type="button"
+                        value="Delete"
+                        key={note.id}
+                        onClick={(e) => dispatch(deleteNote(note.id))}
+                      />
+                    </td>
                   </tr>
                 );
               }

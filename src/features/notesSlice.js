@@ -207,6 +207,7 @@ export const {
 export const selectAllNotes = (state) => state.notes.note;
 export const selectUniqueCompany = (state) => state.notes.uniqueCompany;
 export const selectFilteredNotes = (state) => state.notes.filteredNotes;
+export const selectLoading = (state) => state.notes.loading;
 export const selectedCompanyCount = (state) =>
   state.notes.selectedCompanyFilters.length;
 export const notesReducer = notes.reducer;
